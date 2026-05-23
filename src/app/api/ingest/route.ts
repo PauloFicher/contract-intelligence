@@ -23,8 +23,8 @@ const supabaseAdmin = createClient(
 );
 
 const LLM_PROVIDER = process.env.LLM_PROVIDER || 'openai';
-const LLM_BASE_URL = LLM_PROVIDER === 'deepseek' ? 'https://api.deepseek.com/v1' : undefined;
-const LLM_API_KEY = LLM_PROVIDER === 'deepseek' ? (process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY) : process.env.OPENAI_API_KEY;
+const LLM_BASE_URL = LLM_PROVIDER === 'deepseek' ? 'https://api.deepseek.com/v1' : LLM_PROVIDER === 'groq' ? 'https://api.groq.com/openai/v1' : undefined;
+const LLM_API_KEY = LLM_PROVIDER === 'deepseek' ? (process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY) : LLM_PROVIDER === 'groq' ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY;
 
 const openai = new OpenAI({
   apiKey: LLM_API_KEY,

@@ -21,15 +21,15 @@ const supabaseAdmin = createClient(
 );
 
 const LLM_PROVIDER = process.env.LLM_PROVIDER || 'openai';
-const LLM_BASE_URL = LLM_PROVIDER === 'deepseek' ? 'https://api.deepseek.com/v1' : undefined;
-const LLM_API_KEY = LLM_PROVIDER === 'deepseek' ? (process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY) : process.env.OPENAI_API_KEY;
+const LLM_BASE_URL = LLM_PROVIDER === 'deepseek' ? 'https://api.deepseek.com/v1' : LLM_PROVIDER === 'groq' ? 'https://api.groq.com/openai/v1' : undefined;
+const LLM_API_KEY = LLM_PROVIDER === 'deepseek' ? (process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY) : LLM_PROVIDER === 'groq' ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY;
 
 const openai = new OpenAI({
   apiKey: LLM_API_KEY,
   baseURL: LLM_BASE_URL || undefined,
 });
 const EMBEDDING_MODEL = process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small';
-const CHAT_MODEL = process.env.LLM_PROVIDER === 'deepseek' ? 'deepseek-chat' : (process.env.OPENAI_CHAT_MODEL || 'gpt-4o-mini');
+const CHAT_MODEL = process.env.LLM_PROVIDER === 'deepseek' ? 'deepseek-chat' : process.env.LLM_PROVIDER === 'groq' ? (process.env.GROQ_MODEL || 'qwen/qwen3-32b') : (process.env.OPENAI_CHAT_MODEL || 'gpt-4o-mini');
 
 const RAG_SYSTEM_PROMPT = `Eres un asistente legal especializado en contratos inmobiliarios de Azeta Inmobiliaria (Paraguay).
 Tu funcion es responder preguntas sobre contratos de alquiler, compraventa y leasing basandote UNICAMENTE en los fragmentos de contrato que se te proporcionan.
