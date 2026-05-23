@@ -13,7 +13,7 @@ export default function Home() {
   const [messages, setMessages] = useState<Msg[]>([{
     id: 'init',
     role: 'agent',
-    content: 'Contract Intelligence para Azeta Inmobiliaria. Preguntame sobre clausulas de contratos.',
+    content: 'Contract Intelligence para Azeta Inmobiliaria. Preguntame sobre clausulas de contratos de alquiler, compraventa y leasing.',
   }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,44 +53,65 @@ export default function Home() {
   };
 
   return (
-    <main className="max-w-3xl mx-auto p-6 min-h-screen flex flex-col">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Contract Intelligence</h1>
-        <p className="text-sm text-slate-500">Azeta Inmobiliaria - Busqueda semantica de contratos (RAG)</p>
+    <main className="min-h-screen flex flex-col bg-[#f5f5f7]">
+      <header className="sticky top-0 z-10 px-6 py-4 bg-white/70 backdrop-blur-xl border-b border-black/5">
+        <h1 className="text-lg font-semibold text-[#1d1d1f] tracking-tight">Contract Intelligence</h1>
+        <p className="text-sm text-[#86868b] mt-0.5">Azeta Inmobiliaria &middot; Busqueda semantica de contratos (RAG)</p>
       </header>
 
-      <div className="flex-1 bg-white rounded-2xl border shadow-sm flex flex-col overflow-hidden">
-        <div className="flex-1 p-4 space-y-3 overflow-y-auto max-h-[60vh]">
+      <div className="flex-1 max-w-3xl w-full mx-auto flex flex-col px-4 py-6">
+        <div className="flex-1 space-y-4 overflow-y-auto pb-4 max-h-[calc(100vh-10rem)]">
           {messages.map((m) => (
             <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${m.role === 'user' ? 'bg-teal-600 text-white rounded-br-md' : 'bg-slate-100 text-slate-800 rounded-bl-md'}`}>
+              <div className={`max-w-[80%] px-4 py-2.5 text-sm leading-relaxed rounded-2xl ${
+                m.role === 'user'
+                  ? 'bg-[#0071e3] text-white rounded-br-md'
+                  : 'bg-[#f0f0f3] text-[#1d1d1f] rounded-bl-md'
+              }`}>
                 {m.content}
-                {m.sources?.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-slate-300/50 space-y-1">
+                {m.sources && m.sources.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-black/5 flex flex-wrap gap-1.5">
                     {m.sources.map((s, i) => (
-                      <p key={i} className="text-[10px] text-slate-500">
-                        Fuente {i + 1}: {(s.similarity * 100).toFixed(0)}% match - {s.clauseType || 'sin tipo'} - "{s.snippet}"
-                      </p>
+                      <span key={i} className="bg-black/[0.04] rounded-full px-2.5 py-1 text-[11px] text-[#86868b]">
+                        <span className="font-medium text-[#6e6e73]">{(s.similarity*100).toFixed(0)}%</span>
+                        <span className="mx-1 text-black/10">&middot;</span>
+                        <span>{s.clauseType || 'sin tipo'}</span>
+                        <span className="mx-1 text-black/10">&middot;</span>
+                        <span className="italic">{s.snippet}</span>
+                      </span>
                     ))}
                   </div>
                 )}
               </div>
             </div>
           ))}
-          {loading && <div className="text-slate-400 text-sm">Buscando en contratos...</div>}
+          {loading && (
+            <div className="flex justify-start">
+              <div className="bg-[#f0f0f3] text-[#86868b] text-sm px-4 py-2.5 rounded-2xl rounded-bl-md">
+                Buscando en contratos...
+              </div>
+            </div>
+          )}
           <div ref={endRef} />
         </div>
 
-        <form onSubmit={(e) => { e.preventDefault(); send(); }} className="border-t p-3 flex gap-2">
+        <form
+          onSubmit={(e) => { e.preventDefault(); send(); }}
+          className="bg-white border border-black/5 rounded-2xl p-3 flex gap-2"
+        >
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ej: Clausula de rescision anticipada en alquileres..."
-            className="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-teal-500"
+            placeholder="Clausula de rescision anticipada en alquileres..."
+            className="flex-1 px-4 py-2.5 rounded-xl border border-black/[0.08] bg-white text-[#1d1d1f] text-sm placeholder:text-[#86868b] focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/10"
             disabled={loading}
           />
-          <button type="submit" disabled={loading || !input.trim()} className="px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-semibold disabled:opacity-30">
+          <button
+            type="submit"
+            disabled={loading || !input.trim()}
+            className="px-5 py-2 bg-[#0071e3] text-white rounded-full text-sm font-medium hover:bg-[#0077ed] disabled:opacity-40 transition-all shrink-0"
+          >
             Buscar
           </button>
         </form>
