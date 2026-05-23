@@ -20,9 +20,16 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const LLM_PROVIDER = process.env.LLM_PROVIDER || 'openai';
+const LLM_BASE_URL = LLM_PROVIDER === 'deepseek' ? 'https://api.deepseek.com/v1' : undefined;
+const LLM_API_KEY = LLM_PROVIDER === 'deepseek' ? (process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY) : process.env.OPENAI_API_KEY;
+
+const openai = new OpenAI({
+  apiKey: LLM_API_KEY,
+  baseURL: LLM_BASE_URL || undefined,
+});
 const EMBEDDING_MODEL = process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small';
-const CHAT_MODEL = process.env.OPENAI_CHAT_MODEL || 'gpt-4o-mini';
+const CHAT_MODEL = process.env.LLM_PROVIDER === 'deepseek' ? 'deepseek-chat' : (process.env.OPENAI_CHAT_MODEL || 'gpt-4o-mini');
 
 const RAG_SYSTEM_PROMPT = `Eres un asistente legal especializado en contratos inmobiliarios de Azeta Inmobiliaria (Paraguay).
 Tu funcion es responder preguntas sobre contratos de alquiler, compraventa y leasing basandote UNICAMENTE en los fragmentos de contrato que se te proporcionan.
